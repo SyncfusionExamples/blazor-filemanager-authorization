@@ -1392,7 +1392,7 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
 
 #else
 
-        public virtual FileStreamResult Download(string path, string[] names, params FileManagerDirectoryContent[] data)
+        public virtual FileStreamResult Download(string path, string[] names, params Syncfusion.Blazor.FileManager.FileManagerDirectoryContent[] data)
         {
             try
             {

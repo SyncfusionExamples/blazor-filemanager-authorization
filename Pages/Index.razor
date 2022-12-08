@@ -8,9 +8,9 @@
         {
             <SfFileManager TValue="Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent">
                 <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?Role=Admin"
-                                     DownloadUrl="/api/SampleData/FileOperations"
-                                     GetImageUrl="/api/SampleData/FileOperations"
-                                     UploadUrl="/api/SampleData/FileOperations">
+                                     DownloadUrl="/api/SampleData/Download"
+                                     GetImageUrl="/api/SampleData/GetImage"
+                                     UploadUrl="/api/SampleData/Upload">
                 </FileManagerAjaxSettings>
                 <FileManagerToolbarSettings Items="@toolbarItems"></FileManagerToolbarSettings>
             </SfFileManager>
@@ -19,9 +19,9 @@
         {
             <SfFileManager TValue="Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent">
                 <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?Role=Employee"
-                                     DownloadUrl="/api/SampleData/FileOperations"
-                                     GetImageUrl="/api/SampleData/FileOperations"
-                                     UploadUrl="/api/SampleData/FileOperations">
+                                     DownloadUrl="/api/SampleData/Download"
+                                     GetImageUrl="/api/SampleData/GetImage"
+                                     UploadUrl="/api/SampleData/Upload">
                 </FileManagerAjaxSettings>
                 <FileManagerToolbarSettings Items="@toolbarItems"></FileManagerToolbarSettings>
             </SfFileManager>
@@ -30,7 +30,8 @@
         {
             <SfFileManager TValue="Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent">
                 <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?User=AuthorizedUser"
-                                     GetImageUrl="/api/SampleData/FileOperations">
+                                     DownloadUrl="/api/SampleData/Download"
+                                     GetImageUrl="/api/SampleData/GetImage">
                 </FileManagerAjaxSettings>
                 <FileManagerToolbarSettings Items="@toolbarItems"></FileManagerToolbarSettings>
             </SfFileManager>

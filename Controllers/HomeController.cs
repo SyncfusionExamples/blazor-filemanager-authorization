@@ -3,6 +3,9 @@
 using Syncfusion.Blazor.FileManager;
 using Microsoft.AspNetCore.Hosting;
 using Syncfusion.EJ2.FileManager.PhysicalFileProvider;
+using Microsoft.AspNetCore.Http.Features;
+using Newtonsoft.Json;
+using Syncfusion.EJ2.FileManager.Base;
 
 namespace Blazor_Authentication.Controllers
 {
@@ -20,7 +23,7 @@ namespace Blazor_Authentication.Controllers
         public PhysicalFileProvider operation;
         public string basePath;
         string root = "wwwroot\\Files";
-        [Obsolete]
+
         public SampleDataController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
             this.basePath = hostingEnvironment.ContentRootPath;
@@ -43,7 +46,7 @@ namespace Blazor_Authentication.Controllers
                 // Path - Current path where details of file/folder is requested; Name - Names of the requested folders
                 return this.operation.ToCamelCase(this.operation.Details(args.Path, args.Names));
 
-            if (Role == "admin")
+            if (Role == "Admin")
             {
                 if (args.Action == "create")
                     // Path - Current path where the folder is to be created; Name - Name of the new folder
@@ -53,7 +56,7 @@ namespace Blazor_Authentication.Controllers
                     return this.operation.ToCamelCase(this.operation.Delete(args.Path, args.Names));
             }
 
-            if (Role == "admin" || Role == "employee")
+            if (Role == "Admin" || Role == "Employee")
             {
                 if (args.Action == "copy")
                     //  Path - Path from where the file was copied; TargetPath - Path where the file/folder is to be copied; RenameFiles - Files with same name in the copied location that is confirmed for renaming; TargetData - Data of the copied file
@@ -68,5 +71,62 @@ namespace Blazor_Authentication.Controllers
 
             return null;
         }
+
+        [Route("Upload")]
+        public IActionResult Upload(string path, IList<IFormFile> uploadFiles, string action)
+        {
+            FileManagerResponse uploadResponse;
+            foreach (var file in uploadFiles)
+            {
+                var folders = (file.FileName).Split('/');
+                // checking the folder upload
+                if (folders.Length > 1)
+                {
+                    for (var i = 0; i < folders.Length - 1; i++)
+                    {
+                        string newDirectoryPath = Path.Combine(this.basePath + path, folders[i]);
+                        if (!Directory.Exists(newDirectoryPath))
+                        {
+                            this.operation.ToCamelCase(this.operation.Create(path, folders[i]));
+                        }
+                        path += folders[i] + "/";
+                    }
+                }
+            }
+            uploadResponse = operation.Upload(path, uploadFiles, action, null);
+            if (uploadResponse.Error != null)
+            {
+                Response.Clear();
+                Response.ContentType = "application/json; charset=utf-8";
+                Response.StatusCode = Convert.ToInt32(uploadResponse.Error.Code);
+                Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = uploadResponse.Error.Message;
+            }
+            return Content("");
+        }
+        /// <summary>
+        /// downloads the selected file(s) and folder(s)
+        /// </summary>
+        /// <param name="downloadInput"></param>
+        /// <returns></returns>
+        //[HttpPost]
+        [Route("Download")]
+        public IActionResult Download(string downloadInput)
+        {
+            Syncfusion.Blazor.FileManager.FileManagerDirectoryContent args = JsonConvert.DeserializeObject<Syncfusion.Blazor.FileManager.FileManagerDirectoryContent>(downloadInput);
+            return operation.Download(args.Path, args.Names, args.Data);
+        }
+
+        /// <summary>
+        ///  gets the image(s) from the given path
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        //[HttpGet]
+        [Route("GetImage")]
+        public IActionResult GetImage(Syncfusion.Blazor.FileManager.FileManagerDirectoryContent args)
+        {
+            return this.operation.GetImage(args.Path, args.Id, false, null, null);
+        }
+
     }
 }
