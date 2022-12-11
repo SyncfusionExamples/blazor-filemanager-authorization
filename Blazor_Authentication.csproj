@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Base\AccessPermission.cs" />
+    <Compile Remove="Models\Base\ErrorDetails.cs" />
+    <Compile Remove="Models\Base\FileDetails.cs" />
+    <Compile Remove="Models\Base\FileManagerDirectoryContent.cs" />
+    <Compile Remove="Models\Base\FileManagerParams.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.11" />

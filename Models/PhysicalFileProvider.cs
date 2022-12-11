@@ -1,12 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text.RegularExpressions;
-using Syncfusion.EJ2.FileManager.Base;
+using Syncfusion.Blazor.FileManager.Base;
+using Syncfusion.Blazor.FileManager;
 
 
 #if EJ2_DNX
@@ -18,13 +15,12 @@ using System.Drawing.Drawing2D;
 using System.Web;
 #else
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 #endif
 
 namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
 {
-    public class PhysicalFileProvider : PhysicalFileProviderBase
+    public class PhysicalFileProvider : IPhysicalFileProviderBase
     {
         protected string contentRootPath;
         protected string[] allowedExtension = new string[] { "*" };
@@ -315,9 +311,9 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
                     fileDetails.Name = info.Name == "" ? directory.Name : info.Name;
                     fileDetails.IsFile = (File.GetAttributes(fullPath) & FileAttributes.Directory) != FileAttributes.Directory;
                     fileDetails.Size = (File.GetAttributes(fullPath) & FileAttributes.Directory) != FileAttributes.Directory ? byteConversion(info.Length).ToString() : byteConversion(GetDirectorySize(new DirectoryInfo(fullPath), 0)).ToString();
-                    fileDetails.Created = info.CreationTime;
+                    fileDetails.Created = info.CreationTime.ToLongDateString();
                     fileDetails.Location = GetRelativePath(string.IsNullOrEmpty(this.hostName) ? baseDirectory.Parent.FullName : baseDirectory.Parent.FullName + Path.DirectorySeparatorChar, info.FullName).Substring(1);
-                    fileDetails.Modified = info.LastWriteTime;
+                    fileDetails.Modified = info.LastWriteTime.ToLongDateString();
                     fileDetails.Permission = GetPermission(physicalPath, fileDetails.Name, fileDetails.IsFile);
                     detailFiles = fileDetails;
                 }
@@ -1978,7 +1974,7 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
             });
         }
 
-        FileStreamResult FileProviderBase.Download(string path, string[] names, params FileManagerDirectoryContent[] data)
+        FileStreamResult IFileProviderBase.Download(string path, string[] names, params FileManagerDirectoryContent[] data)
         {
             throw new NotImplementedException();
         }

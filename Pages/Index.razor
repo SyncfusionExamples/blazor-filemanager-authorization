@@ -6,7 +6,7 @@
         
         @if (context.User.IsInRole("Admin"))
         {
-            <SfFileManager TValue="Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent">
+            <SfFileManager TValue="FileManagerDirectoryContent">
                 <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?Role=Admin"
                                      DownloadUrl="/api/SampleData/Download"
                                      GetImageUrl="/api/SampleData/GetImage"
@@ -17,7 +17,7 @@
         }
         else if (context.User.IsInRole("Employee"))
         {
-            <SfFileManager TValue="Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent">
+            <SfFileManager TValue="FileManagerDirectoryContent">
                 <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?Role=Employee"
                                      DownloadUrl="/api/SampleData/Download"
                                      GetImageUrl="/api/SampleData/GetImage"
@@ -28,7 +28,7 @@
         }
         else
         {
-            <SfFileManager TValue="Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent">
+            <SfFileManager TValue="FileManagerDirectoryContent">
                 <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?User=AuthorizedUser"
                                      DownloadUrl="/api/SampleData/Download"
                                      GetImageUrl="/api/SampleData/GetImage">

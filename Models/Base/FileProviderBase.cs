@@ -9,10 +9,12 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
+using Syncfusion.Blazor.FileManager.Base;
+using Syncfusion.Blazor.FileManager;
 
-namespace Syncfusion.EJ2.FileManager.Base
+namespace Syncfusion.Blazor.FileManager.Base
 {
-    public interface FileProviderBase
+    public interface IFileProviderBase
     {
 
         FileManagerResponse GetFiles(string path, bool showHiddenItems, params FileManagerDirectoryContent[] data);

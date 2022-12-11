@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 //using Microsoft.Extensions.FileProviders;
 using Syncfusion.Blazor.FileManager;
-using Microsoft.AspNetCore.Hosting;
 using Syncfusion.EJ2.FileManager.PhysicalFileProvider;
 using Microsoft.AspNetCore.Http.Features;
 using Newtonsoft.Json;
-using Syncfusion.EJ2.FileManager.Base;
+using Syncfusion.Blazor.FileManager.Base;
 
 namespace Blazor_Authentication.Controllers
 {
@@ -33,7 +32,7 @@ namespace Blazor_Authentication.Controllers
 
         // Processing the File Manager operations.
         [Route("FileOperations")]
-        public object? FileOperations([FromBody] Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent args, string Role)
+        public object? FileOperations([FromBody] FileManagerDirectoryContent args, string Role)
         {
 
             if (args.Action == "read")
@@ -112,7 +111,7 @@ namespace Blazor_Authentication.Controllers
         [Route("Download")]
         public IActionResult Download(string downloadInput)
         {
-            Syncfusion.Blazor.FileManager.FileManagerDirectoryContent args = JsonConvert.DeserializeObject<Syncfusion.Blazor.FileManager.FileManagerDirectoryContent>(downloadInput);
+            FileManagerDirectoryContent args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(downloadInput);
             return operation.Download(args.Path, args.Names, args.Data);
         }
 
@@ -123,7 +122,7 @@ namespace Blazor_Authentication.Controllers
         /// <returns></returns>
         //[HttpGet]
         [Route("GetImage")]
-        public IActionResult GetImage(Syncfusion.Blazor.FileManager.FileManagerDirectoryContent args)
+        public IActionResult GetImage(FileManagerDirectoryContent args)
         {
             return this.operation.GetImage(args.Path, args.Id, false, null, null);
         }
