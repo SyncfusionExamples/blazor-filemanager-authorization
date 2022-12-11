@@ -4,19 +4,8 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Syncfusion.Blazor.FileManager.Base;
 using Syncfusion.Blazor.FileManager;
-
-
-#if EJ2_DNX
-using System.Web.Mvc;
-using System.IO.Packaging;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
-using System.Web;
-#else
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-#endif
 
 namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
 {
@@ -44,12 +33,6 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
             }
         }
 
-        public void SetRules(AccessDetails details)
-        {
-            this.AccessDetails = details;
-            DirectoryInfo root = new DirectoryInfo(this.contentRootPath);
-            this.rootName = root.Name;
-        }
 
         public virtual FileManagerResponse GetFiles(string path, bool showHiddenItems, params FileManagerDirectoryContent[] data)
         {
@@ -1066,13 +1049,6 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
                 if (PathPermission != null && !PathPermission.Read)
                     return null;
                 String fullPath = (contentRootPath + path);
-#if EJ2_DNX
-                if (allowCompress)
-                {
-                    size = new ImageSize { Height = 14, Width = 16 };
-                    CompressImage(fullPath, size);
-                }
-#endif
 
                 FileStream fileStreamInput = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
                 FileStreamResult fileStreamResult = new FileStreamResult(fileStreamInput, "APPLICATION/octet-stream");
@@ -1084,75 +1060,8 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
             }
         }
 
-#if EJ2_DNX
-        protected virtual void CompressImage(string path, ImageSize targetSize)
-        {
-            using (var image = Image.FromStream(System.IO.File.OpenRead(path)))
-            {
-                var originalSize = new ImageSize { Height = image.Height, Width = image.Width };
-                var size = FindRatio(originalSize, targetSize);
-                using (var thumbnail = new Bitmap(size.Width, size.Height))
-                {
-                    using (var graphics = Graphics.FromImage(thumbnail))
-                    {
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.CompositingQuality = CompositingQuality.HighQuality;
-                        graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                        graphics.PixelOffsetMode = PixelOffsetMode.Default;
-                        graphics.InterpolationMode = InterpolationMode.Bicubic;
-                        graphics.DrawImage(image, 0, 0, thumbnail.Width, thumbnail.Height);
-                    }
 
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        thumbnail.Save(memoryStream, ImageFormat.Png);
-                        HttpResponse response = HttpContext.Current.Response;
-                        response.Buffer = true;
-                        response.Clear();
-                        response.ContentType = "image/png";
-                        response.BinaryWrite(memoryStream.ToArray());
-                        response.Flush();
-                        response.End();
-                    }
-                }
-            }
-        }
-      
-        protected virtual ImageSize FindRatio(ImageSize originalSize, ImageSize targetSize)
-        {
-            var aspectRatio = (float)originalSize.Width / (float)originalSize.Height;
-            var width = targetSize.Width;
-            var height = targetSize.Height;
-
-            if (originalSize.Width > targetSize.Width || originalSize.Height > targetSize.Height)
-            {
-                if (aspectRatio > 1)
-                {
-                    height = (int)(targetSize.Height / aspectRatio);
-                }
-                else
-                {
-                    width = (int)(targetSize.Width * aspectRatio);
-                }
-            }
-            else
-            {
-                width = originalSize.Width;
-                height = originalSize.Height;
-            }
-
-            return new ImageSize
-            {
-                Width = Math.Max(width, 1),
-                Height = Math.Max(height, 1)
-            };
-        }
-#endif
-#if EJ2_DNX
-        public virtual FileManagerResponse Upload(string path, IList<System.Web.HttpPostedFileBase> uploadFiles, string action, params FileManagerDirectoryContent[] data)
-#else
         public virtual FileManagerResponse Upload(string path, IList<IFormFile> uploadFiles, string action, params FileManagerDirectoryContent[] data)
-#endif
         {
             FileManagerResponse uploadResponse = new FileManagerResponse();
             try
@@ -1165,34 +1074,21 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
                 }
 
                 List<string> existFiles = new List<string>();
-#if EJ2_DNX
-                foreach (System.Web.HttpPostedFileBase file in uploadFiles)
-#else
                 foreach (IFormFile file in uploadFiles)
-#endif
                 {
                     if (uploadFiles != null)
                     {
-#if EJ2_DNX
-                        var name = System.IO.Path.GetFileName(file.FileName);
-                        var fullName = Path.Combine((this.contentRootPath + path), name);
-#else
                         var name = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim().ToString();
                         var fullName = Path.Combine((this.contentRootPath + path), name);
-#endif
                         if (action == "save")
                         {
                             if (!System.IO.File.Exists(fullName))
                             {
-#if !EJ2_DNX
                                 using (FileStream fs = System.IO.File.Create(fullName))
                                 {
                                     file.CopyTo(fs);
                                     fs.Flush();
                                 }
-#else
-                                file.SaveAs(fullName);
-#endif
                             }
                             else
                             {
@@ -1219,15 +1115,13 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
                             {
                                 System.IO.File.Delete(fullName);
                             }
-#if !EJ2_DNX
+
                             using (FileStream fs = System.IO.File.Create(fullName))
                             {
                                 file.CopyTo(fs);
                                 fs.Flush();
                             }
-#else
-                            file.SaveAs(fullName);
-#endif
+
                         }
                         else if (action == "keepboth")
                         {
@@ -1241,15 +1135,11 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
                                 fileCount++;
                             }
                             newName = newName + (fileCount > 0 ? "(" + fileCount.ToString() + ")" : "") + Path.GetExtension(name);
-#if !EJ2_DNX
                             using (FileStream fs = System.IO.File.Create(newName))
                             {
                                 file.CopyTo(fs);
                                 fs.Flush();
                             }
-#else
-                            file.SaveAs(newName);
-#endif
                         }
                     }
                 }
@@ -1274,119 +1164,6 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
                 return uploadResponse;
             }
         }
-#if SyncfusionFramework4_0
-        public virtual void Download(string path, string[] names, params FileManagerDirectoryContent[] data)
-        {
-            try
-            {
-                string physicalPath = GetPath(path);
-                String extension;
-                int count = 0;
-                for (var i = 0; i < names.Length; i++)
-                {
-                    bool IsFile = !IsDirectory(physicalPath, names[i]);
-                    AccessPermission FilePermission = GetPermission(physicalPath, names[i], IsFile);
-                    if (FilePermission != null && (!FilePermission.Read || !FilePermission.Download))
-                     throw new UnauthorizedAccessException("'" + this.getFileNameFromPath(this.rootName + path + names[i]) + "' is not accessible. You need permission to perform the download action.");
-
-                    extension = Path.GetExtension(names[i]);
-                    if (extension != "")
-                    {
-                        count++;
-                    }
-                }
-                if (names.Length > 1)
-                    DownloadZip(path, names);
-
-                if (count == names.Length)
-                {
-                    DownloadFile(path, names);
-                }
-
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-        private FileStreamResult fileStreamResult;
-        protected virtual void DownloadFile(string path, string[] names = null)
-        {
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                try
-                {
-                    path = (Path.Combine(contentRootPath + path, names[0]));
-                    HttpResponse response = HttpContext.Current.Response;
-                    response.Buffer = true;
-                    response.Clear();
-                    response.ContentType = "APPLICATION/octet-stream";
-                    string extension = System.IO.Path.GetExtension(path);
-                    response.AddHeader("content-disposition", string.Format("attachment; filename = \"{0}\"", System.IO.Path.GetFileName(path)));
-                    response.WriteFile(path);
-                    response.Flush();
-                    response.End();
-                }
-                catch (Exception ex) { throw ex; }
-            }
-            else throw new ArgumentNullException("name should not be null");
-
-        }
-
-        protected virtual void DownloadZip(string path, string[] names)
-        {
-            HttpResponse response = HttpContext.Current.Response;
-            string tempPath = Path.Combine(Path.GetTempPath(), "temp.zip");
-
-            for (int i = 0; i < names.Count(); i++)
-            {
-                string fullPath = Path.Combine(contentRootPath + path, names[0]);
-                if (!string.IsNullOrEmpty(fullPath))
-                {
-                    try
-                    {
-                        var physicalPath = Path.Combine(contentRootPath + path, names[0]);
-                        AddFileToZip(tempPath, physicalPath);
-                    }
-                    catch (Exception ex) { throw ex; }
-                }
-                else throw new ArgumentNullException("name should not be null");
-            }
-            try
-            {
-                System.Net.WebClient net = new System.Net.WebClient();
-                response.ClearHeaders();
-                response.Clear();
-                response.Expires = 0;
-                response.Buffer = true;
-                response.AddHeader("Content-Disposition", "Attachment;FileName=Files.zip");
-                response.ContentType = "application/zip";
-                response.BinaryWrite(net.DownloadData(tempPath));
-                response.End();
-                if (System.IO.File.Exists(tempPath))
-                    System.IO.File.Delete(tempPath);
-            }
-            catch (Exception ex) { throw ex; }
-        }
-
-        protected virtual void AddFileToZip(string zipFileName, string fileToAdd)
-        {
-            using (Package zip = System.IO.Packaging.Package.Open(zipFileName, FileMode.OpenOrCreate))
-            {
-                string destFilename = ".\\" + Path.GetFileName(fileToAdd);
-                Uri uri = PackUriHelper.CreatePartUri(new Uri(destFilename, UriKind.Relative));
-                if (zip.PartExists(uri))
-                    zip.DeletePart(uri);
-                PackagePart pkgPart = zip.CreatePart(uri, System.Net.Mime.MediaTypeNames.Application.Zip, CompressionOption.Normal);
-                Byte[] bites = System.IO.File.ReadAllBytes(fileToAdd);
-                pkgPart.GetStream().Write(bites, 0, bites.Length);
-                zip.Close();
-            }
-        }
-
-#else
 
         public virtual FileStreamResult Download(string path, string[] names, params Syncfusion.Blazor.FileManager.FileManagerDirectoryContent[] data)
         {
@@ -1605,7 +1382,6 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
             }
         }
 
-#endif
         private string DirectoryRename(string newPath)
         {
             int directoryCount = 0;
@@ -1962,23 +1738,14 @@ namespace Syncfusion.EJ2.FileManager.PhysicalFileProvider
         {
             return JsonConvert.SerializeObject(userData, new JsonSerializerSettings
             {
-#if EJ2_DNX
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
 
-#else
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = new CamelCaseNamingStrategy()
                 }
-#endif
+
             });
         }
-
-        FileStreamResult IFileProviderBase.Download(string path, string[] names, params FileManagerDirectoryContent[] data)
-        {
-            throw new NotImplementedException();
-        }
-
         private bool CheckChild(string path)
         {
             bool hasChild;
