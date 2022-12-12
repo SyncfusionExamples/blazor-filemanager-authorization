@@ -7,10 +7,10 @@
         @if (context.User.IsInRole("Admin"))
         {
             <SfFileManager TValue="FileManagerDirectoryContent">
-                <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?Role=Admin"
-                                     DownloadUrl="/api/SampleData/Download"
-                                     GetImageUrl="/api/SampleData/GetImage"
-                                     UploadUrl="/api/SampleData/Upload">
+                <FileManagerAjaxSettings Url="/api/FileManager/FileOperations?Role=Admin"
+                                     DownloadUrl="/api/FileManager/Download"
+                                     GetImageUrl="/api/FileManager/GetImage"
+                                     UploadUrl="/api/FileManager/Upload">
                 </FileManagerAjaxSettings>
                 <FileManagerToolbarSettings Items="@toolbarItems"></FileManagerToolbarSettings>
             </SfFileManager>
@@ -18,10 +18,10 @@
         else if (context.User.IsInRole("Employee"))
         {
             <SfFileManager TValue="FileManagerDirectoryContent">
-                <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?Role=Employee"
-                                     DownloadUrl="/api/SampleData/Download"
-                                     GetImageUrl="/api/SampleData/GetImage"
-                                     UploadUrl="/api/SampleData/Upload">
+                <FileManagerAjaxSettings Url="/api/FileManager/FileOperations?Role=Employee"
+                                     DownloadUrl="/api/FileManager/Download"
+                                     GetImageUrl="/api/FileManager/GetImage"
+                                     UploadUrl="/api/FileManager/Upload">
                 </FileManagerAjaxSettings>
                 <FileManagerToolbarSettings Items="@toolbarItems"></FileManagerToolbarSettings>
             </SfFileManager>
@@ -29,9 +29,9 @@
         else
         {
             <SfFileManager TValue="FileManagerDirectoryContent">
-                <FileManagerAjaxSettings Url="/api/SampleData/FileOperations?User=AuthorizedUser"
-                                     DownloadUrl="/api/SampleData/Download"
-                                     GetImageUrl="/api/SampleData/GetImage">
+                <FileManagerAjaxSettings Url="/api/FileManager/FileOperations?User=AuthorizedUser"
+                                     DownloadUrl="/api/FileManager/Download"
+                                     GetImageUrl="/api/FileManager/GetImage">
                 </FileManagerAjaxSettings>
                 <FileManagerToolbarSettings Items="@toolbarItems"></FileManagerToolbarSettings>
             </SfFileManager>

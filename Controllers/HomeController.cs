@@ -17,13 +17,13 @@ namespace Blazor_Authentication.Controllers
     }
 
     [Route("api/[controller]")]
-    public class SampleDataController : Controller
+    public class FileManagerController : Controller
     {
         public PhysicalFileProvider operation;
         public string basePath;
         string root = "wwwroot\\Files";
 
-        public SampleDataController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
+        public FileManagerController(Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment)
         {
             this.basePath = hostingEnvironment.ContentRootPath;
             this.operation = new PhysicalFileProvider();
@@ -34,17 +34,6 @@ namespace Blazor_Authentication.Controllers
         [Route("FileOperations")]
         public object? FileOperations([FromBody] FileManagerDirectoryContent args, string Role)
         {
-
-            if (args.Action == "read")
-                // Path - Current path; ShowHiddenItems - Boolean value to show/hide hidden items.
-                return this.operation.ToCamelCase(this.operation.GetFiles(args.Path, args.ShowHiddenItems));
-            else if (args.Action == "search")
-                // Path - Current path where the search is performed; SearchString - String typed in the searchbox; CaseSensitive - Boolean value which specifies whether the search must be casesensitive
-                return this.operation.ToCamelCase(this.operation.Search(args.Path, args.SearchString, args.ShowHiddenItems, args.CaseSensitive));
-            else if (args.Action == "details")
-                // Path - Current path where details of file/folder is requested; Name - Names of the requested folders
-                return this.operation.ToCamelCase(this.operation.Details(args.Path, args.Names));
-
             if (Role == "Admin")
             {
                 if (args.Action == "create")
@@ -67,6 +56,16 @@ namespace Blazor_Authentication.Controllers
                     // Path - Current path of the renamed file; Name - Old file name; NewName - New file name
                     return this.operation.ToCamelCase(this.operation.Rename(args.Path, args.Name, args.NewName));
             }
+
+            if (args.Action == "read")
+                // Path - Current path; ShowHiddenItems - Boolean value to show/hide hidden items.
+                return this.operation.ToCamelCase(this.operation.GetFiles(args.Path, args.ShowHiddenItems));
+            else if (args.Action == "search")
+                // Path - Current path where the search is performed; SearchString - String typed in the searchbox; CaseSensitive - Boolean value which specifies whether the search must be casesensitive
+                return this.operation.ToCamelCase(this.operation.Search(args.Path, args.SearchString, args.ShowHiddenItems, args.CaseSensitive));
+            else if (args.Action == "details")
+                // Path - Current path where details of file/folder is requested; Name - Names of the requested folders
+                return this.operation.ToCamelCase(this.operation.Details(args.Path, args.Names));
 
             return null;
         }
